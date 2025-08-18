@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Skip to content link for accessibility */
+.skip-link {
+  @apply absolute -top-10 left-6 z-50 bg-navy text-white px-4 py-2 rounded;
+  @apply focus:top-6 transition-all duration-200;
+}
+
+/* Focus styles for accessibility */
+*:focus {
+  @apply outline-none ring-2 ring-blueA ring-offset-2;
+}
+
+/* Custom button styles */
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+  @apply focus:ring-2 focus:ring-offset-2;
+}
+
+.btn-primary {
+  @apply bg-blueA text-white hover:bg-blue-700 focus:ring-blueA;
+}
+
+.btn-secondary {
+  @apply bg-blueB text-white hover:bg-blue-600 focus:ring-blueB;
+}
+
+.btn-outline {
+  @apply border-2 border-blueA text-blueA hover:bg-blueA hover:text-white;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white rounded-xl2 shadow-soft p-6;
+}
+
+/* Form styles */
+.form-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg;
+  @apply focus:ring-2 focus:ring-blueA focus:border-blueA;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+/* Navigation styles */
+.nav-link {
+  @apply text-gray-700 hover:text-blueA transition-colors duration-200;
+  @apply focus:text-blueA focus:outline-none;
+}
+
+.nav-link.active {
+  @apply text-blueA font-medium;
+}
