@@ -1,52 +1,55 @@
 <template>
   <div class="py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="mb-8 flex justify-between items-center">
+      <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 class="text-3xl font-bold text-white">Reports & Analytics</h1>
-          <p class="text-blue-200">View platform performance and insights</p>
+          <h1 class="text-3xl sm:text-4xl font-heading font-semibold text-navy-900">Reports & Analytics</h1>
+          <p class="text-navy-600 text-lg">View platform performance and insights</p>
         </div>
-        <div class="flex gap-2">
-          <select v-model="selectedPeriod" @change="loadReports" class="form-input">
+        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <select v-model="selectedPeriod" @change="loadReports" class="form-input w-full sm:w-auto">
             <option value="7">Last 7 days</option>
             <option value="30">Last 30 days</option>
             <option value="90">Last 90 days</option>
             <option value="365">Last year</option>
           </select>
-          <button @click="exportReports" class="btn bg-white text-navy hover:bg-gray-100">
+          <button @click="exportReports" class="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 hover:scale-105 hover:shadow-md">
+            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
             Export CSV
           </button>
         </div>
       </div>
 
       <!-- Key Metrics -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg p-6 shadow">
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
+        <div class="bg-white rounded-lg p-4 sm:p-6 shadow hover:shadow-md transition-shadow duration-200">
           <div class="flex items-center">
-            <div class="p-3 rounded-full bg-blue-100">
-              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="p-3 rounded-full bg-gradient-to-r from-primary-100 to-primary-200">
+              <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
               </svg>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">New Members</p>
-              <p class="text-2xl font-semibold text-gray-900">{{ reportsData?.new_members || 0 }}</p>
-              <p class="text-xs text-green-600">+{{ reportsData?.member_growth_rate || 0 }}% from last period</p>
+              <p class="text-sm font-medium text-navy-600">New Members</p>
+              <p class="text-2xl font-semibold text-navy-900">{{ reportsData?.new_members || 0 }}</p>
+              <p class="text-xs text-emerald-600">+{{ reportsData?.member_growth_rate || 0 }}% from last period</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg p-6 shadow">
+        <div class="bg-white rounded-lg p-4 sm:p-6 shadow hover:shadow-md transition-shadow duration-200">
           <div class="flex items-center">
-            <div class="p-3 rounded-full bg-green-100">
-              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="p-3 rounded-full bg-gradient-to-r from-emerald-100 to-emerald-200">
+              <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
               </svg>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">Revenue</p>
-              <p class="text-2xl font-semibold text-gray-900">{{ formatCurrency(reportsData?.total_revenue || 0) }}</p>
-              <p class="text-xs text-green-600">+{{ reportsData?.revenue_growth_rate || 0 }}% from last period</p>
+              <p class="text-sm font-medium text-navy-600">Revenue</p>
+              <p class="text-2xl font-semibold text-navy-900">{{ formatCurrency(reportsData?.total_revenue || 0) }}</p>
+              <p class="text-xs text-emerald-600">+{{ reportsData?.revenue_growth_rate || 0 }}% from last period</p>
             </div>
           </div>
         </div>

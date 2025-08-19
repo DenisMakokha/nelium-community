@@ -4,13 +4,13 @@
 
 /* Skip to content link for accessibility */
 .skip-link {
-  @apply absolute -top-10 left-6 z-50 bg-navy text-white px-4 py-2 rounded;
+  @apply absolute -top-10 left-6 z-50 bg-navy-800 text-white px-4 py-2 rounded;
   @apply focus:top-6 transition-all duration-200;
 }
 
 /* Focus styles for accessibility */
 *:focus {
-  @apply outline-none ring-2 ring-blueA ring-offset-2;
+  @apply outline-none ring-2 ring-primary-500 ring-offset-2;
 }
 
 /* Custom button styles */
@@ -20,26 +20,26 @@
 }
 
 .btn-primary {
-  @apply bg-blueA text-white hover:bg-blue-700 focus:ring-blueA;
+  @apply bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500;
 }
 
 .btn-secondary {
-  @apply bg-blueB text-white hover:bg-blue-600 focus:ring-blueB;
+  @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-600;
 }
 
 .btn-outline {
-  @apply border-2 border-blueA text-blueA hover:bg-blueA hover:text-white;
+  @apply border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white;
 }
 
 /* Card styles */
 .card {
-  @apply bg-white rounded-xl2 shadow-soft p-6;
+  @apply bg-white rounded-xl shadow-lg p-6;
 }
 
 /* Form styles */
 .form-input {
   @apply w-full px-3 py-2 border border-gray-300 rounded-lg;
-  @apply focus:ring-2 focus:ring-blueA focus:border-blueA;
+  @apply focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
 }
 
 .form-label {
@@ -48,10 +48,10 @@
 
 /* Navigation styles */
 .nav-link {
-  @apply text-gray-700 hover:text-blueA transition-colors duration-200;
-  @apply focus:text-blueA focus:outline-none;
+  @apply text-gray-700 hover:text-primary-500 transition-colors duration-200;
+  @apply focus:text-primary-500 focus:outline-none;
 }
 
 .nav-link.active {
-  @apply text-blueA font-medium;
+  @apply text-primary-500 font-medium;
 }

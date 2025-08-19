@@ -1,12 +1,17 @@
 <template>
   <div class="py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="mb-8 flex justify-between items-center">
+      <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 class="text-3xl font-bold text-white">Announcements</h1>
-          <p class="text-blue-200">Manage community announcements and notifications</p>
+          <h1 class="text-3xl sm:text-4xl font-heading font-semibold text-navy-900">Announcements</h1>
+          <p class="text-navy-600 text-lg">Manage community announcements and notifications</p>
         </div>
-        <button @click="openAddModal" class="btn bg-white text-navy hover:bg-gray-100">Add Announcement</button>
+        <button @click="openAddModal" class="w-full sm:w-auto bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:from-primary-600 hover:to-primary-700 transition-all duration-200 hover:scale-105 hover:shadow-md">
+          <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+          </svg>
+          Add Announcement
+        </button>
       </div>
 
       <!-- Filters -->
@@ -47,52 +52,86 @@
           <p class="text-sm mt-2">Create your first announcement to get started</p>
         </div>
 
-        <div v-else class="divide-y divide-gray-200">
-          <div v-if="!loading && announcements?.data?.length === 0" class="text-center py-8 text-gray-500">
-            No announcements found
-          </div>
-
-          <div v-if="!loading && announcements?.data?.length > 0" class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-            <table class="min-w-full divide-y divide-gray-300">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                  <th class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="announcement in announcements.data" :key="announcement.id" class="hover:bg-gray-50">
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900">{{ announcement.title }}</div>
-                    <div class="text-sm text-gray-500">{{ announcement.content.substring(0, 100) }}...</div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span :class="getStatusClass(announcement.status)" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
-                      {{ announcement.status }}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span :class="getPriorityClass(announcement.priority)" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
+        <div v-else>
+          <!-- Modern Card Layout -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 p-6">
+            <div v-for="announcement in announcements.data" :key="announcement.id" 
+                 class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group hover:scale-105 border border-gray-100">
+              <div class="p-6">
+                <!-- Header with Priority and Actions -->
+                <div class="flex items-start justify-between mb-4">
+                  <div class="w-12 h-12 bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <svg v-if="announcement.priority === 'high'" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    <svg v-else-if="announcement.priority === 'medium'" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <svg v-else class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span :class="getPriorityClass(announcement.priority)" class="px-3 py-1 text-xs font-medium rounded-full">
                       {{ announcement.priority }}
                     </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <span :class="getStatusClass(announcement.status)" class="px-3 py-1 text-xs font-medium rounded-full">
+                      {{ announcement.status }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Title and Content -->
+                <h3 class="text-xl font-semibold text-navy-900 mb-3 group-hover:text-primary-600 transition-colors line-clamp-2">
+                  {{ announcement.title }}
+                </h3>
+                <p class="text-navy-600 mb-4 leading-relaxed line-clamp-3">
+                  {{ announcement.content }}
+                </p>
+
+                <!-- Metadata -->
+                <div class="flex items-center justify-between text-sm text-navy-500 mb-4">
+                  <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
                     {{ announcement.author?.name || 'Unknown' }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  </span>
+                  <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
                     {{ formatDate(announcement.created_at) }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button @click="editAnnouncement(announcement)" class="text-blueA hover:text-blue-900 mr-3">Edit</button>
-                    <button @click="deleteAnnouncement(announcement)" class="text-red-600 hover:text-red-900">Delete</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </span>
+                </div>
+
+                <!-- Scheduled Info -->
+                <div v-if="announcement.scheduled_at" class="flex items-center text-sm text-amber-600 mb-4 bg-amber-50 px-3 py-2 rounded-lg">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  Scheduled: {{ formatDate(announcement.scheduled_at) }}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex space-x-2">
+                  <button @click="editAnnouncement(announcement)" 
+                          class="flex-1 bg-gradient-to-r from-primary-500 to-primary-600 text-white py-2 px-4 rounded-lg font-medium hover:from-primary-600 hover:to-primary-700 transition-all duration-200 hover:shadow-md text-sm">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    Edit
+                  </button>
+                  <button @click="deleteAnnouncement(announcement)" 
+                          class="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white py-2 px-4 rounded-lg font-medium hover:from-red-600 hover:to-red-700 transition-all duration-200 hover:shadow-md text-sm">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Pagination -->

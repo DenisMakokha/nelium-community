@@ -2,8 +2,8 @@
   <div class="py-8">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Profile Settings</h1>
-        <p class="text-gray-600">Manage your account information and preferences</p>
+        <h1 class="text-3xl sm:text-4xl font-heading font-semibold text-navy-900">Profile Settings</h1>
+        <p class="text-navy-600 text-lg">Manage your account information and preferences</p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">

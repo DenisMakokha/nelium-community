@@ -2,8 +2,8 @@
   <div class="py-8">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Billing & Subscription</h1>
-        <p class="text-gray-600">Manage your subscription and payment methods</p>
+        <h1 class="text-3xl sm:text-4xl font-heading font-semibold text-navy-900">Billing & Subscription</h1>
+        <p class="text-navy-600 text-lg">Manage your subscription and payment methods</p>
       </div>
 
       <div class="space-y-8">

@@ -1,31 +1,36 @@
 <template>
   <div class="py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="mb-8 flex justify-between items-center">
+      <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 class="text-3xl font-bold text-white">Events</h1>
-          <p class="text-blue-200">Manage community events</p>
+          <h1 class="text-3xl sm:text-4xl font-heading font-semibold text-navy-900">Events</h1>
+          <p class="text-navy-600 text-lg">Manage community events ({{ events?.total || 0 }} total)</p>
         </div>
-        <button @click="openAddModal" class="btn bg-white text-navy hover:bg-gray-100">Create Event</button>
+        <button @click="openAddModal" class="w-full sm:w-auto bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:from-primary-600 hover:to-primary-700 transition-all duration-200 hover:scale-105 hover:shadow-md">
+          <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Create Event
+        </button>
       </div>
 
       <!-- Filters -->
-      <div class="bg-white rounded-lg p-6 shadow mb-6">
-        <div class="flex flex-wrap gap-4">
+      <div class="bg-white rounded-lg p-4 sm:p-6 shadow mb-6">
+        <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
           <input 
             v-model="filters.search" 
             @input="debouncedSearch"
             type="search" 
             placeholder="Search events..." 
-            class="form-input flex-1 max-w-md"
+            class="form-input flex-1 w-full sm:max-w-md"
           >
-          <select v-model="filters.location_type" @change="loadEvents" class="form-input w-auto">
+          <select v-model="filters.location_type" @change="loadEvents" class="form-input w-full sm:w-auto">
             <option value="all">All Types</option>
             <option value="online">Online</option>
             <option value="physical">Physical</option>
             <option value="hybrid">Hybrid</option>
           </select>
-          <select v-model="filters.tier" @change="loadEvents" class="form-input w-auto">
+          <select v-model="filters.tier" @change="loadEvents" class="form-input w-full sm:w-auto">
             <option value="all">All Tiers</option>
             <option value="FREE">Free</option>
             <option value="IND">Individual</option>
@@ -35,19 +40,25 @@
       </div>
 
       <!-- Events List -->
-      <div class="bg-white rounded-lg shadow">
-        <div v-if="loading" class="flex justify-center items-center py-12">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blueA mx-auto"></div>
-          <p class="mt-2 text-gray-600">Loading events...</p>
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div v-if="loading" class="flex flex-col justify-center items-center py-20">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-200 border-t-primary-500"></div>
+          <p class="text-navy-600 mt-4 text-lg">Loading events...</p>
         </div>
         
-        <div v-if="!loading && events?.data?.length === 0" class="text-center py-8 text-gray-500">
-          No events found
+        <div v-if="!loading && events?.data?.length === 0" class="text-center py-12">
+          <div class="w-16 h-16 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-navy-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <p class="text-navy-500 text-lg font-medium">No events found</p>
+          <p class="text-navy-400 text-sm">Create your first event to get started</p>
         </div>
 
-        <div v-if="!loading && events?.data?.length > 0" class="divide-y divide-gray-200">
-          <div v-for="event in events.data" :key="event.id" class="p-6 hover:bg-gray-50">
-            <div class="flex items-start justify-between">
+        <div v-if="!loading && events?.data?.length > 0" class="divide-y divide-gray-100">
+          <div v-for="event in events.data" :key="event.id" class="p-4 sm:p-6 hover:bg-primary-50 transition-colors duration-150 group">
+            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
               <div class="flex-1">
                 <div class="flex items-center mb-2">
                   <span :class="getLocationTypeClass(event.location_type)" class="text-xs px-2 py-1 rounded-full mr-2">

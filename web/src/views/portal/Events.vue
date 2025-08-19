@@ -2,20 +2,20 @@
   <div class="py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Community Events</h1>
-        <p class="text-gray-600">Discover and join upcoming community events</p>
+        <h1 class="text-3xl sm:text-4xl font-heading font-semibold text-navy-900">Community Events</h1>
+        <p class="text-navy-600 text-lg">Discover and join upcoming community events</p>
       </div>
 
       <!-- Filter Bar -->
-      <div class="mb-6 flex flex-wrap gap-4">
-        <select class="form-input w-auto">
+      <div class="mb-6 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
+        <select class="form-input w-full sm:w-auto">
           <option>All Events</option>
           <option>This Week</option>
           <option>This Month</option>
           <option>Virtual</option>
           <option>In-Person</option>
         </select>
-        <input type="search" placeholder="Search events..." class="form-input flex-1 max-w-md">
+        <input type="search" placeholder="Search events..." class="form-input flex-1 w-full sm:max-w-md">
       </div>
 
       <!-- Events List -->

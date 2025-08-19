@@ -1,12 +1,17 @@
 <template>
   <div class="py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="mb-8 flex justify-between items-center">
+      <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 class="text-3xl font-bold text-white">Members</h1>
-          <p class="text-blue-200">Manage community members ({{ membersData?.total || 0 }} total)</p>
+          <h1 class="text-3xl sm:text-4xl font-heading font-semibold text-navy-900">Members</h1>
+          <p class="text-navy-600 text-lg">Manage community members ({{ membersData?.total || 0 }} total)</p>
         </div>
-        <button @click="showAddModal = true" class="btn bg-white text-navy hover:bg-gray-100">Add Member</button>
+        <button @click="showAddModal = true" class="w-full sm:w-auto bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:from-primary-600 hover:to-primary-700 transition-all duration-200 hover:scale-105 hover:shadow-md">
+          <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Add Member
+        </button>
       </div>
 
       <!-- Filters -->
@@ -46,47 +51,90 @@
         </div>
 
         <table v-else class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead class="bg-gradient-to-r from-navy-50 to-primary-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-navy-700 uppercase tracking-wider">Member</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-navy-700 uppercase tracking-wider">Plan</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-navy-700 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-navy-700 uppercase tracking-wider">Joined</th>
+              <th class="px-6 py-4 text-right text-xs font-semibold text-navy-700 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="member in membersData.data" :key="member.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="h-10 w-10 rounded-full bg-blueA text-white flex items-center justify-center text-sm font-medium">
-                    {{ getInitials(member.name) }}
+          <tbody class="bg-white divide-y divide-gray-100">
+            <!-- Loading Skeleton -->
+            <template v-if="loading">
+              <SkeletonLoader v-for="i in 5" :key="i" type="table-row" />
+            </template>
+            
+            <!-- Actual Data -->
+            <template v-else>
+              <tr v-for="(member, index) in membersData?.data" :key="member.id" 
+                  :class="index % 2 === 0 ? 'bg-white' : 'bg-gray-50'" 
+                  class="hover:bg-primary-50 transition-colors duration-150 group">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="h-9 w-9 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 text-white flex items-center justify-center text-xs font-semibold shadow-sm group-hover:scale-105 transition-transform">
+                      {{ getInitials(member.name) }}
+                    </div>
+                    <div class="ml-3">
+                      <div class="text-sm font-semibold text-navy-900 group-hover:text-primary-700 transition-colors">{{ member.name }}</div>
+                      <div class="text-sm text-navy-500">{{ member.email }}</div>
+                    </div>
                   </div>
-                  <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900">{{ member.name }}</div>
-                    <div class="text-sm text-gray-500">{{ member.email }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-navy-700">
+                  {{ member.phone || 'N/A' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span :class="getStatusClass(member.subscription_status)" class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full">
+                    <div class="w-2 h-2 rounded-full mr-2" :class="getStatusDotClass(member.subscription_status)"></div>
+                    {{ member.subscription_status || 'inactive' }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-navy-700 font-medium">{{ formatDate(member.created_at) }}</div>
+                  <div class="text-xs text-navy-500">{{ getRelativeTime(member.created_at) }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right">
+                  <div class="flex items-center justify-end space-x-2">
+                    <button @click="editMember(member)" 
+                            class="inline-flex items-center p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-all duration-200 hover:scale-105"
+                            title="Edit Member">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </button>
+                    <button @click="suspendMember(member)" 
+                            class="inline-flex items-center p-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-all duration-200 hover:scale-105"
+                            title="Suspend Member">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"></path>
+                      </svg>
+                    </button>
+                    <button @click="deleteMember(member)" 
+                            class="inline-flex items-center p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-105"
+                            title="Delete Member">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
                   </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                  {{ member.subscription?.plan?.name || 'No Plan' }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="getStatusClass(member.subscription?.status || 'inactive')" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
-                  {{ member.subscription?.status || 'Inactive' }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ formatDate(member.created_at) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button @click="editMember(member)" class="text-blueA hover:text-blue-900 mr-3">Edit</button>
-                <button @click="suspendMember(member)" class="text-yellow-600 hover:text-yellow-900 mr-3">Suspend</button>
-                <button @click="deleteMember(member)" class="text-red-600 hover:text-red-900">Delete</button>
-              </td>
-            </tr>
+                </td>
+              </tr>
+              <tr v-if="!membersData?.data?.length">
+                <td colspan="5" class="px-6 py-12 text-center">
+                  <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 bg-navy-100 rounded-full flex items-center justify-center mb-4">
+                      <svg class="w-8 h-8 text-navy-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                      </svg>
+                    </div>
+                    <p class="text-navy-500 text-lg font-medium">No members found</p>
+                    <p class="text-navy-400 text-sm">Members will appear here once they join your community</p>
+                  </div>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
         
@@ -226,9 +274,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 import { adminService, type Member } from '@/services/adminService'
 import { debounce } from 'lodash-es'
+import SkeletonLoader from '@/components/SkeletonLoader.vue'
 
 const loading = ref(true)
 const membersData = ref<any>(null)
@@ -378,14 +427,28 @@ const getInitials = (name: string) => {
 const getStatusClass = (status: string) => {
   switch (status?.toLowerCase()) {
     case 'active':
-      return 'bg-green-100 text-green-800'
+      return 'bg-emerald-100 text-emerald-800 border border-emerald-200'
     case 'cancelled':
     case 'inactive':
-      return 'bg-red-100 text-red-800'
+      return 'bg-red-100 text-red-800 border border-red-200'
     case 'pending':
-      return 'bg-yellow-100 text-yellow-800'
+      return 'bg-amber-100 text-amber-800 border border-amber-200'
     default:
-      return 'bg-gray-100 text-gray-800'
+      return 'bg-gray-100 text-gray-800 border border-gray-200'
+  }
+}
+
+const getStatusDotClass = (status: string) => {
+  switch (status?.toLowerCase()) {
+    case 'active':
+      return 'bg-emerald-500'
+    case 'cancelled':
+    case 'inactive':
+      return 'bg-red-500'
+    case 'pending':
+      return 'bg-amber-500'
+    default:
+      return 'bg-gray-500'
   }
 }
 
@@ -395,6 +458,18 @@ const formatDate = (dateString: string) => {
     month: 'short',
     day: 'numeric'
   })
+}
+
+const getRelativeTime = (dateString: string) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffTime = Math.abs(now.getTime() - date.getTime())
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  
+  if (diffDays === 1) return '1 day ago'
+  if (diffDays < 30) return `${diffDays} days ago`
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`
+  return `${Math.floor(diffDays / 365)} years ago`
 }
 
 onMounted(() => {
