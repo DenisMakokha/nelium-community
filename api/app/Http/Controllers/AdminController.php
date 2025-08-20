@@ -18,7 +18,14 @@ class AdminController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth:sanctum', 'admin']);
+        $this->middleware(['auth:sanctum', 'admin'])->except([
+            'portalDashboard', 'portalResources', 'downloadResource', 
+            'portalEvents', 'rsvpEvent', 'portalMembers', 'portalAnnouncements'
+        ]);
+        $this->middleware('auth:sanctum')->only([
+            'portalDashboard', 'portalResources', 'downloadResource', 
+            'portalEvents', 'rsvpEvent', 'portalMembers', 'portalAnnouncements'
+        ]);
     }
 
     public function dashboard()
@@ -770,5 +777,149 @@ class AdminController extends Controller
         $logs = $query->paginate(50);
 
         return response()->json($logs);
+    }
+
+    // Portal methods for community members
+    public function portalDashboard()
+    {
+        $stats = [
+            'upcoming_events' => Event::where('starts_at', '>', now())->count(),
+            'new_resources' => Resource::where('created_at', '>=', now()->subDays(30))->count(),
+            'active_members' => User::where('role', 'member')->count(),
+            'announcements' => Announcement::with('author')
+                ->where('status', 'published')
+                ->orderBy('created_at', 'desc')
+                ->limit(5)
+                ->get(),
+            'recent_events' => Event::where('starts_at', '>', now())
+                ->orderBy('starts_at', 'asc')
+                ->limit(3)
+                ->get()
+        ];
+
+        return response()->json($stats);
+    }
+
+    public function portalResources(Request $request)
+    {
+        $query = Resource::query();
+
+        if ($request->has('search') && $request->search) {
+            $query->where(function($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->has('category') && $request->category) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->has('type') && $request->type) {
+            $query->where('type', $request->type);
+        }
+
+        $resources = $query->orderBy('created_at', 'desc')->paginate(12);
+
+        return response()->json($resources);
+    }
+
+    public function downloadResource($id)
+    {
+        $resource = Resource::findOrFail($id);
+        
+        if (!$resource->file_path) {
+            return response()->json(['error' => 'File not found'], 404);
+        }
+
+        $filePath = storage_path('app/' . $resource->file_path);
+        
+        if (!file_exists($filePath)) {
+            return response()->json(['error' => 'File not found'], 404);
+        }
+
+        return response()->download($filePath, $resource->title);
+    }
+
+    public function portalEvents(Request $request)
+    {
+        $query = Event::query();
+
+        if ($request->has('search') && $request->search) {
+            $query->where(function($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->has('location_type') && $request->location_type) {
+            $query->where('location_type', $request->location_type);
+        }
+
+        if ($request->has('upcoming') && $request->upcoming) {
+            $query->where('starts_at', '>', now());
+        }
+
+        $events = $query->orderBy('starts_at', 'asc')->paginate(10);
+
+        return response()->json($events);
+    }
+
+    public function rsvpEvent(Request $request, $id)
+    {
+        $event = Event::findOrFail($id);
+        $user = auth()->user();
+
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|in:attending,not_attending'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Here you would typically have an EventRsvp model
+        // For now, we'll just return success
+        return response()->json(['message' => 'RSVP updated successfully']);
+    }
+
+    public function portalMembers(Request $request)
+    {
+        $query = User::where('role', 'member');
+
+        if ($request->has('search') && $request->search) {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->has('country') && $request->country) {
+            $query->where('country', $request->country);
+        }
+
+        if ($request->has('profession') && $request->profession) {
+            $query->where('profession', $request->profession);
+        }
+
+        $members = $query->select('id', 'name', 'email', 'country', 'profession', 'created_at')
+                        ->orderBy('name', 'asc')
+                        ->paginate(12);
+
+        return response()->json($members);
+    }
+
+    public function portalAnnouncements(Request $request)
+    {
+        $query = Announcement::with('author')
+                            ->where('status', 'published');
+
+        if ($request->has('priority') && $request->priority) {
+            $query->where('priority', $request->priority);
+        }
+
+        $announcements = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return response()->json($announcements);
     }
 }

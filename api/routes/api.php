@@ -48,6 +48,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/history', [PaymentController::class, 'getPaymentHistory']);
     });
 
+    // Portal routes (for community members)
+    Route::prefix('portal')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'portalDashboard']);
+        Route::get('/resources', [AdminController::class, 'portalResources']);
+        Route::get('/resources/{resource}/download', [AdminController::class, 'downloadResource']);
+        Route::get('/events', [AdminController::class, 'portalEvents']);
+        Route::post('/events/{event}/rsvp', [AdminController::class, 'rsvpEvent']);
+        Route::get('/members', [AdminController::class, 'portalMembers']);
+        Route::get('/announcements', [AdminController::class, 'portalAnnouncements']);
+    });
+
     // Admin routes
     Route::prefix('admin')->middleware('admin')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard']);
